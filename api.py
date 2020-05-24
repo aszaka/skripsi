@@ -6,6 +6,8 @@ from openpyxl import load_workbook
 import pickle
 import mysql.connector
 import os
+import json
+import simplejson
 
 
 db = mysql.connector.connect(
@@ -156,8 +158,8 @@ def rekap():
         cursor = db.cursor()
         # sql = "SELECT waktu, pelatihan, sentimen FROM tanggapan"
         # sql = "SELECT waktu, pelatihan, COUNT(sentimen) as sentimen FROM tanggapan WHERE sentimen=1 GROUP BY waktu"
-        sql = "SELECT waktu, pelatihan, replace(replace(sentimen, '1', 'positif'), '0', 'negatif') FROM tanggapan GROUP BY waktu, sentimen"
-        # val = (waktu.value, nim.value, pelatihan.value, pesan.value, 0)
+        sql = "SELECT pesan_id, waktu, pesan_asli, replace(replace(sentimen, '1', 'positif'), '0', 'negatif') FROM tanggapan GROUP BY waktu, sentimen"
+        # val = (pesan_id.value, waktu.value, nim.value, pelatihan.value, pesan.value, 0)
         cursor.execute(sql)
         rv = cursor.fetchall()
         return render_template("rekap.html", value=rv)
@@ -171,6 +173,29 @@ def rekap():
 
 #   return html
 
+
+@app.route('/grafik')
+def grafik():
+    
+    return render_template('grafik.php')
+
+# @app.route('/graph')
+# def graph():
+
+#     pcen = db.cursor()
+#     sql_pcen = "SELECT round((SELECT COUNT(*) FROM `tanggapan` WHERE sentimen = '1') / (SELECT COUNT(*) FROM `tanggapan`) * 100) as positif, round((SELECT COUNT(*) FROM `tanggapan` WHERE sentimen = '0') / (SELECT COUNT(*) FROM `tanggapan`) * 100) as negatif from tanggapan LIMIT 1"
+#     pcen.execute(sql_pcen)
+#     pce = pcen.fetchall()
+
+#     arr=[]
+#     for product in pce:
+#         vals = {}
+#         vals['Positif']=product[0]
+#         vals['Negatif']=product[1]
+#         arr.append(vals)
+#     jsongr = json.dumps(arr)
+
+#     return jsongr
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
